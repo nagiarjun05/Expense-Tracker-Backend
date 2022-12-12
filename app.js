@@ -7,7 +7,7 @@ dotenv.config();
 
 const bodyParser = require('body-parser');
 
-const User=require('./models/User');
+// const User=require('./models/User');
 
 const sequelize =require('./util/database')
 // const errorController = require('./controllers/error');
@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const userRoutes=require('./routes/user');
-// const expenseRoutes=require('./routes/expense');
+const expenseRoutes=require('./routes/expense');
 
 // To handle forms
 // app.use(bodyParser.urlencoded({ extended: false })); 
@@ -39,7 +39,7 @@ app.use(bodyParser.json())
 // });
 
 app.use('/users',userRoutes);
-// app.use('/expenses',expenseRoutes);
+app.use('/expenses',expenseRoutes);
 
 // app.use(errorController.get404);
 

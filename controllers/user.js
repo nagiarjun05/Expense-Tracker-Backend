@@ -30,7 +30,7 @@ const signup= async (req, res)=>{
                 email: email,
                 password: hash
             });
-            res.status(201).json({success: true, massage: "Succesfully create new User"});
+            await res.status(201).json({success: true, message: "Succesfully create new User"});
         }) 
     } catch(err){
         res.status(500).json(err);
@@ -49,7 +49,7 @@ const login=async (req, res)=>{
                     throw new Error('Something went wrong')
                 }
                 else if(result){
-                res.status(200).json({success: true, message: 'User Loged in Succesfully!'})
+                    res.status(200).json({success: true, message: 'User Loged in Succesfully!'})
                 }
                 else{
                     return res.status(400).json({success: false, message: 'Password is Inconrrect!'})
@@ -61,7 +61,7 @@ const login=async (req, res)=>{
     }
     catch(err){
         res.status(500).json({
-            error: err
+            message: err
         })
     }
 };
