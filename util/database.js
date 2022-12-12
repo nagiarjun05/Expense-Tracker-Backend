@@ -5,6 +5,7 @@ const sequelize=new Sequelize(process.env.DB_NAME,process.env.DB_USERNAME,proces
     host:process.env.DB_HOST
 });
 
+// const sequelize=new Sequelize('lsk')
 module.exports=sequelize;
 
 // const mysql  = require('mysql2');

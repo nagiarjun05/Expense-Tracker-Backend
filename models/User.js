@@ -2,7 +2,6 @@ const Sequelize=require('sequelize');
 
 const sequelize=require('../util/database');
 
-
 const User=sequelize.define('user',{
   id:{
     type:Sequelize.INTEGER,
@@ -16,10 +15,9 @@ const User=sequelize.define('user',{
     allowNull: false,
     unique: true
   },
-  phonenumber:{
+  password:{
     type: Sequelize.STRING,
-    allowNull: false,
-    unique: true
+    allowNull: false
   }
 });
 
