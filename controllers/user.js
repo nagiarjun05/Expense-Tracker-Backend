@@ -1,5 +1,6 @@
 const User=require('../models/User');
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
 
 function stringValidator(string){
     if(string===undefined||string.length===0){
@@ -7,6 +8,10 @@ function stringValidator(string){
     }else{
         return false
     }
+}
+
+function generateTokken(id,name){
+    return jwt.sign({userId: id, name: name}, 'secretToken')
 }
 
 const signup= async (req, res)=>{
@@ -49,7 +54,7 @@ const login=async (req, res)=>{
                     throw new Error('Something went wrong')
                 }
                 else if(result){
-                    res.status(200).json({success: true, message: 'User Loged in Succesfully!'})
+                    return res.status(200).json({success: true, message: 'User Loged in Succesfully!', token:(generateTokken(users[0].dataValues.id,users[0].dataValues.name))})
                 }
                 else{
                     return res.status(400).json({success: false, message: 'Password is Inconrrect!'})

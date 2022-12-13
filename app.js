@@ -7,8 +7,8 @@ dotenv.config();
 
 const bodyParser = require('body-parser');
 
-// const User=require('./models/User');
-
+const User=require('./models/User');
+const Expense=require('./models/expense')
 const sequelize =require('./util/database')
 // const errorController = require('./controllers/error');
 
@@ -55,6 +55,10 @@ app.use('/expenses',expenseRoutes);
 // User.belongsTo(Review);
 // Restaurant.hasMany(Review)
 // Review.belongsToMany(User,{through: UserReview})
+
+User.hasMany(Expense);
+Expense.belongsTo(User);
+
 
 sequelize
 .sync()
