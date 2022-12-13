@@ -7,9 +7,11 @@ dotenv.config();
 
 const bodyParser = require('body-parser');
 
+const sequelize =require('./util/database')
+
 const User=require('./models/User');
 const Expense=require('./models/expense')
-const sequelize =require('./util/database')
+const Order=require('./models/order');
 // const errorController = require('./controllers/error');
 
 
@@ -20,6 +22,7 @@ app.set('views', 'views');
 
 const userRoutes=require('./routes/user');
 const expenseRoutes=require('./routes/expense');
+const purchaseRoutes=require('./routes/purchase');
 
 // To handle forms
 // app.use(bodyParser.urlencoded({ extended: false })); 
@@ -40,6 +43,7 @@ app.use(bodyParser.json())
 
 app.use('/users',userRoutes);
 app.use('/expenses',expenseRoutes);
+app.use('/purchase',purchaseRoutes)
 
 // app.use(errorController.get404);
 
@@ -59,10 +63,12 @@ app.use('/expenses',expenseRoutes);
 User.hasMany(Expense);
 Expense.belongsTo(User);
 
+User.hasMany(Order);
+Order.belongsTo(User);
 
 sequelize
-.sync()
-// .sync({force: true})
+// .sync()
+.sync({force: true})
 // .then((result)=>{
 //     return User.findByPk(1);
 // })
