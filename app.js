@@ -23,7 +23,7 @@ app.set('views', 'views');
 const userRoutes=require('./routes/user');
 const expenseRoutes=require('./routes/expense');
 const purchaseRoutes=require('./routes/purchase');
-
+const premiumRoutes=require('./routes/premium');
 // To handle forms
 // app.use(bodyParser.urlencoded({ extended: false })); 
 
@@ -43,7 +43,8 @@ app.use(bodyParser.json())
 
 app.use('/users',userRoutes);
 app.use('/expenses',expenseRoutes);
-app.use('/purchase',purchaseRoutes)
+app.use('/purchase',purchaseRoutes);
+app.use('/premium',premiumRoutes);
 
 // app.use(errorController.get404);
 
@@ -67,8 +68,8 @@ User.hasMany(Order);
 Order.belongsTo(User);
 
 sequelize
-// .sync()
-.sync({force: true})
+.sync()
+// .sync({force: true})
 // .then((result)=>{
 //     return User.findByPk(1);
 // })

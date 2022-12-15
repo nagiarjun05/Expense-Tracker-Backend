@@ -10,8 +10,8 @@ function stringValidator(string){
     }
 }
 
-function generateTokken(id,name){
-    return jwt.sign({userId: id, name: name}, 'secretToken')
+function generateTokken(id,name,ispremiumuser){
+    return jwt.sign({userId: id, name: name, ispremiumuser}, 'secretToken')
 }
 
 const signup= async (req, res)=>{
@@ -54,7 +54,7 @@ const login=async (req, res)=>{
                     throw new Error('Something went wrong')
                 }
                 else if(result){
-                    return res.status(200).json({success: true, message: 'User Loged in Succesfully!', token:(generateTokken(users[0].dataValues.id,users[0].dataValues.name))})
+                    return res.status(200).json({success: true, message: 'User Loged in Succesfully!', token:(generateTokken(users[0].dataValues.id,users[0].dataValues.name,users[0].dataValues.ispremiumuser))})
                 }
                 else{
                     return res.status(400).json({success: false, message: 'Password is Inconrrect!'})

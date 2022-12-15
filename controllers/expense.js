@@ -22,9 +22,9 @@ const addExpense= async (req, res)=>{
 
 const getExpenses=async (req, res)=>{
     try{
-        // console.log(req.headers.authorization)
         const expenses = await Expense.findAll({where:{userId:req.user.id}});
-        res.status(200).json({allExpenses: expenses});
+        // console.log(req.user.ispremiumuser)
+        res.status(200).json({allExpenses: expenses, premiumuser:req.user.ispremiumuser});
     }
     catch(err){
         res.status(500).json({
