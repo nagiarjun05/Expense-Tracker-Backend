@@ -6,9 +6,9 @@ const router=express.Router();
 
 router.use('/forgetpassword', forgetpasswordController.forgetpassword)
 
-// router.get('/forgetpassword', forgetpasswordController.)
+router.get('/resetpassword/:id', forgetpasswordController.resetpassword)
 
-// router.use('/forgetpassword', forgetpasswordController.)
+router.get('/updatepassword/:id', forgetpasswordController.updatepassword)
 
 
 module.exports=router;

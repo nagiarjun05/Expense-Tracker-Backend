@@ -1,6 +1,9 @@
 const User=require('../models/User')
 const sgMail = require('@sendgrid/mail')
 const uuid=require('uuid');
+const ForgetPassword = require('../models/forgetpassword');
+
+const bcrypt=require('bcrypt');
 
 
 const forgetpassword=async(req, res)=>{
@@ -23,8 +26,10 @@ const forgetpassword=async(req, res)=>{
                 from: 'nagiarjun05@gmail.com', // Change to your verified sender
                 subject: 'Sending with SendGrid is Fun',
                 text: 'and easy to do anywhere, even with Node.js',
-                html: `<a href='http://localhost:4000/password/resetpassword/${id}'>Reset password</a>`,
+                html: `<a href='http://localhost:4000/password/resetpassword/${id}'>Reset password</a>`
               }
+
+            console.log(msg)
               
             sgMail
             .send(msg)
@@ -47,9 +52,66 @@ const forgetpassword=async(req, res)=>{
 }
 
 
-// const resetpassword=(req, res)=>{
-//     const id=
-// }
+const resetpassword=(req, res)=>{
+    const id=req.params.id;
+    
+    ForgetPassword.findOne({where:{id}})
+    .then((user)=>{
+        if (user){
+            user.update({active: false})
+            res.status(200).send(`<html>
+                                    <script>
+                                        function formsubmitted(e){
+                                            e.preventDefault();
+                                            console.log('called')
+                                        }
+                                    </script>
+                                    <form action="/password/updatepassword/${id}" method="get">
+                                        <label for="newpassword">Enter New Password :</label>
+                                        <input type="password" name="newpassword"></input>
+                                        <button>Reset Password</button>
+                                    </form>
+                                </html>`
+                                )
+            res.end()
+        }
+    })
+}
+
+const updatepassword=(req, res)=>{
+    try{
+        const { newpassword } = req.query;
+        const {id}=req.params;
+
+        ForgetPassword.findOne({where:{id}})
+        .then((request)=>{
+            User.findOne({where:{id:request.userId}})
+            .then((user)=>{
+                if(user){
+                    const saltRounds=10;
+
+                    bcrypt.hash(newpassword, saltRounds, function(err, data){
+                        if(err){
+                            throw new Error(err)
+                        }
+
+                        user.update({password: data})
+                        .then(()=>{
+                            res.status(201).json({message: "Successfully update the password"})
+                        })
+                    })
+                }else{
+                    return res.status(404).json({message: "No user exist", succes: false})
+                }
+           })
+        })
+    }
+    catch(error){
+        return res.status(403).json({error, succes: false})
+    }
+}
 module.exports={
-    forgetpassword
+    forgetpassword,
+    resetpassword,
+    updatepassword
 };

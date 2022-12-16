@@ -74,7 +74,7 @@ User.hasMany(ForgetPassword);
 ForgetPassword.belongsTo(User);
 
 sequelize
-.sync()
+.sync() 
 // .sync({force: true})
 // .then((result)=>{
 //     return User.findByPk(1);
