@@ -12,7 +12,7 @@ const sequelize =require('./util/database')
 const User=require('./models/User');
 const Expense=require('./models/expense')
 const Order=require('./models/order');
-// const errorController = require('./controllers/error');
+const ForgetPassword = require('./models/forgetpassword');
 
 
 
@@ -24,6 +24,8 @@ const userRoutes=require('./routes/user');
 const expenseRoutes=require('./routes/expense');
 const purchaseRoutes=require('./routes/purchase');
 const premiumRoutes=require('./routes/premium');
+const forgetpasswordRoutes=require('./routes/forgetpassword');
+
 // To handle forms
 // app.use(bodyParser.urlencoded({ extended: false })); 
 
@@ -45,6 +47,7 @@ app.use('/users',userRoutes);
 app.use('/expenses',expenseRoutes);
 app.use('/purchase',purchaseRoutes);
 app.use('/premium',premiumRoutes);
+app.use('/password',forgetpasswordRoutes);
 
 // app.use(errorController.get404);
 
@@ -66,6 +69,9 @@ Expense.belongsTo(User);
 
 User.hasMany(Order);
 Order.belongsTo(User);
+
+User.hasMany(ForgetPassword);
+ForgetPassword.belongsTo(User);
 
 sequelize
 .sync()

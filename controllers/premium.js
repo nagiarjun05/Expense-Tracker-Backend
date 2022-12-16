@@ -17,10 +17,6 @@ const getLeaderboard=async(req, res)=>{
             group:['user.id'],
             order:[['total','DESC']]
         });
-        // const userAggregateExpense=await Expense.findAll({
-        //     attributes: ['userId',[sequelize.fn('sum',sequelize.col('amount')),'total']],
-        //     group: ['userId']
-        // });
         res.status(200).json(users);
         
         
@@ -35,7 +31,10 @@ const getLeaderboard=async(req, res)=>{
         //         userAggregateExpense[element.userId]=element.amount;
         //     }
         // });
-        // const userLeaderBoard=[];
+        // const userAggregateExpense=await Expense.findAll({
+        //     attributes: ['userId',[sequelize.fn('sum',sequelize.col('amount')),'total']],
+        //     group: ['userId']
+        // });// const userLeaderBoard=[];
         // users.forEach((user)=>{
         //     userLeaderBoard.push({name: user.name, total: userAggregateExpense[user.id]||0})
         // });

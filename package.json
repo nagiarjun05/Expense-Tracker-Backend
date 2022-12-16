@@ -14,6 +14,7 @@
     "nodemon": "^1.18.3"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
@@ -25,6 +26,7 @@
     "mysql2": "^2.3.3",
     "pug": "^2.0.3",
     "razorpay": "^2.8.4",
-    "sequelize": "^6.25.8"
+    "sequelize": "^6.25.8",
+    "uuid": "^9.0.0"
   }
 }
