@@ -13,8 +13,7 @@ const User=require('./models/User');
 const Expense=require('./models/expense')
 const Order=require('./models/order');
 const ForgetPassword = require('./models/forgetpassword');
-
-
+const FilesDownloaded=require('./models/downloadedfiles');
 
 app.use(cors());
 app.set('view engine', 'ejs');
@@ -73,8 +72,11 @@ Order.belongsTo(User);
 User.hasMany(ForgetPassword);
 ForgetPassword.belongsTo(User);
 
+User.hasMany(FilesDownloaded);
+FilesDownloaded.belongsTo(User);
+
 sequelize
-.sync() 
+.sync()
 // .sync({force: true})
 // .then((result)=>{
 //     return User.findByPk(1);

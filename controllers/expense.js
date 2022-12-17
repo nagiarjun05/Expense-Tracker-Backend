@@ -1,4 +1,5 @@
 const Expense = require('../models/expense');
+const ITEM_PER_PAGE=2;
 
 const addExpense= async (req, res)=>{
     try{
@@ -22,11 +23,31 @@ const addExpense= async (req, res)=>{
 
 const getExpenses=async (req, res)=>{
     try{
-        const expenses = await Expense.findAll({where:{userId:req.user.id}});
-        // console.log(req.user.ispremiumuser)
-        res.status(200).json({allExpenses: expenses, premiumuser:req.user.ispremiumuser});
+        const page= +req.query.page || 1;
+        console.log('page',+req.query.page)
+
+        const totalCount = await Expense.count({where:{userId:req.user.id}});
+        const expenses=await Expense.findAll({
+            where:{userId:req.user.id},
+            offset: (page-1)*ITEM_PER_PAGE,
+            limit:ITEM_PER_PAGE
+        })
+        // console.log(expenses);
+        // console.log(totalCount);
+
+        res.status(200).json({
+            allExpenses: expenses, 
+            premiumuser:req.user.ispremiumuser,
+            currentPage:page,
+            hasNextPage:ITEM_PER_PAGE*page<totalCount,
+            nextPage:page+1,
+            hasPreviousPage:page>1,
+            previousPage:page-1,
+            lastPage:Math.ceil(totalCount/ITEM_PER_PAGE)
+        });
     }
     catch(err){
+        console.log(err)
         res.status(500).json({
             error: err
         })

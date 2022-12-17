@@ -1,6 +1,13 @@
 const User=require('../models/User');
+const FileDownloaded=require('../models/downloadedfiles')
+
+
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
+
+
+const AWS=require('aws-sdk');
+const { param } = require('../routes/user');
 
 function stringValidator(string){
     if(string===undefined||string.length===0){
@@ -77,8 +84,54 @@ const login=async (req, res)=>{
 //     res.sendStatus(200);
 // };
 
+function uploadToS3(data, filename){
+    let s3bucket=new AWS.S3({
+        accessKeyId:process.env.IAM_USER_KEY,
+        secretAccessKey:process.env.IAM_USER_SECRET
+    })
+
+    var params={
+        Bucket:process.env.BUCKET_NAME,
+        Key:filename,
+        Body:data,
+        ACL:'public-read'
+    }
+    
+    return new Promise((resolve, reject)=>{
+        s3bucket.upload(params, (err, s3response)=>{
+            if(err){
+                console.log(err)
+                reject(err)
+            }else{
+                resolve(s3response.Location)
+            }
+        })
+    })
+    
+}
+
+const download=async (req, res)=>{
+    try{
+        const expenses= await req.user.getExpenses();
+        const stringifiedExpenses=JSON.stringify(expenses);
+
+        const filename=`Expense${req.user.id}/${new Date()}.txt`;
+        const fileURL= await uploadToS3(stringifiedExpenses, filename);
+        console.log(fileURL)
+        await FileDownloaded.create({
+            url: fileURL
+        });
+
+        res.status(201).json({fileURL, success: true})
+    }
+    catch{
+        res.status(500).json({fileURL:'', success: false, err:err})
+    }  
+}
+
 module.exports={
     signup,
-    login
+    login,
+    download
     // deleteUser
 };
