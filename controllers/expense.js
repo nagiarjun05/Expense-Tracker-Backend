@@ -1,5 +1,4 @@
 const Expense = require('../models/expense');
-const ITEM_PER_PAGE=2;
 
 const addExpense= async (req, res)=>{
     try{
@@ -24,7 +23,8 @@ const addExpense= async (req, res)=>{
 const getExpenses=async (req, res)=>{
     try{
         const page= +req.query.page || 1;
-        console.log('page',+req.query.page)
+        let ITEM_PER_PAGE=+req.headers.rowperpage || 2;
+        console.log(req.headers.rowperpage)
 
         const totalCount = await Expense.count({where:{userId:req.user.id}});
         const expenses=await Expense.findAll({
@@ -32,8 +32,6 @@ const getExpenses=async (req, res)=>{
             offset: (page-1)*ITEM_PER_PAGE,
             limit:ITEM_PER_PAGE
         })
-        // console.log(expenses);
-        // console.log(totalCount);
 
         res.status(200).json({
             allExpenses: expenses, 
