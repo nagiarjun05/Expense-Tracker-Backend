@@ -1,6 +1,9 @@
 const express = require('express');
+const fs=require('fs');
 const cors= require('cors');
 const app = express();
+const helmet=require('helmet');
+const morgan=require('morgan');
 
 const dotenv=require('dotenv');
 dotenv.config();
@@ -24,6 +27,16 @@ const expenseRoutes=require('./routes/expense');
 const purchaseRoutes=require('./routes/purchase');
 const premiumRoutes=require('./routes/premium');
 const forgetpasswordRoutes=require('./routes/forgetpassword');
+const path = require('path');
+
+const accessLogStream=fs.createWriteStream(
+    path.join(__dirname,'access.log'),
+    {flags:'a'}
+);
+
+app.use(helmet());
+app.use(morgan('combined',{stream: accessLogStream}));
+
 
 // To handle forms
 // app.use(bodyParser.urlencoded({ extended: false })); 
