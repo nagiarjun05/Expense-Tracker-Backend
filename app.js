@@ -1,5 +1,6 @@
 const express = require('express');
 const fs=require('fs');
+const https=require('https');
 const cors= require('cors');
 const app = express();
 const helmet=require('helmet');
@@ -104,6 +105,8 @@ sequelize
 //     return user.createCart()
 // })
 .then(cart=>{
+    // https
+    // .createServer(app)
     app.listen(4000);
 })
 .catch(err=>{
