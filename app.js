@@ -1,10 +1,10 @@
 const express = require('express');
-const fs=require('fs');
+// const fs=require('fs');
 const https=require('https');
 const cors= require('cors');
 const app = express();
-const helmet=require('helmet');
-const morgan=require('morgan');
+// const helmet=require('helmet');
+// const morgan=require('morgan');
 
 const dotenv=require('dotenv');
 dotenv.config();
@@ -30,13 +30,15 @@ const premiumRoutes=require('./routes/premium');
 const forgetpasswordRoutes=require('./routes/forgetpassword');
 const path = require('path');
 
-const accessLogStream=fs.createWriteStream(
-    path.join(__dirname,'access.log'),
-    {flags:'a'}
-);
+// const accessLogStream=fs.createWriteStream(
+//     path.join(__dirname,'access.log'),
+//     {flags:'a'}
+// );
 
-app.use(helmet());
-app.use(morgan('combined',{stream: accessLogStream}));
+
+
+// app.use(helmet());
+// app.use(morgan('combined',{stream: accessLogStream}));
 
 
 // To handle forms
@@ -47,35 +49,18 @@ app.use(bodyParser.json())
 
 // app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use((req, res, next)=>{
-//     User.findByPk(1)
-//     .then(user=>{
-//         req.user=user;
-//         next();
-//     })
-//     .catch(err=>console.log(err));
-// });
-
 app.use('/users',userRoutes);
 app.use('/expenses',expenseRoutes);
 app.use('/purchase',purchaseRoutes);
 app.use('/premium',premiumRoutes);
 app.use('/password',forgetpasswordRoutes);
 
-// app.use(errorController.get404);
+app.use((req, res)=>{
+    console.log('urlll', req.url);
+    res.sendFile(path.join(__dirname, `public/${req.url}`))
+})
 
-// Product.belongsTo(User,{ constraints: true, onDelete:"CASCADE"});
-// User.hasMany(Product);
-// User.hasOne(Cart);
-// Cart.belongsTo(User);
-// Cart.belongsToMany(Product,{through: CartItem});
-// Product.belongsToMany(Cart,{through: CartItem});
-// Order.belongsTo(User);
-// User.hasMany(Order);
-// Order.belongsToMany(Product,{through: OrderItem});
-// User.belongsTo(Review);
-// Restaurant.hasMany(Review)
-// Review.belongsToMany(User,{through: UserReview})
+// app.use(errorController.get404);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
@@ -92,18 +77,6 @@ FilesDownloaded.belongsTo(User);
 sequelize
 .sync()
 // .sync({force: true})
-// .then((result)=>{
-//     return User.findByPk(1);
-// })
-// .then((user)=>{
-//     if(!user){
-//         return User.create({name:'Arjun',email:'arjun@gmail.com',password:'9998885225'})
-//     }
-//     return user
-// })
-// .then(user=>{
-//     return user.createCart()
-// })
 .then(cart=>{
     // https
     // .createServer(app)
@@ -112,4 +85,3 @@ sequelize
 .catch(err=>{
     console.log(err)
 });
-

@@ -26,9 +26,6 @@ const signup= async (req, res)=>{
         const name=req.body.name;
         const email=req.body.email;
         const password=req.body.password;
-        // console.log(name);
-        // console.log(email);
-        // console.log(password);
 
         if (stringValidator(name)||stringValidator(email)||stringValidator(password)){
             console.log("error")
@@ -77,12 +74,6 @@ const login=async (req, res)=>{
         })
     }
 };
-
-// const deleteUser=async (req, res)=>{
-//     const uId=req.params.id;
-//     await User.destroy({where:{id: uId}});
-//     res.sendStatus(200);
-// };
 
 function uploadToS3(data, filename){
     let s3bucket=new AWS.S3({
@@ -133,5 +124,4 @@ module.exports={
     signup,
     login,
     download
-    // deleteUser
 };

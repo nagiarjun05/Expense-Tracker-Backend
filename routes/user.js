@@ -11,6 +11,4 @@ router.post('/login', userController.login);
 
 router.get('/download', userAuthentication.authentication , userController.download);
 
-// router.delete('/delete-user/:id', userController.deleteUser);
-
 module.exports=router;

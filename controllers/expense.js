@@ -60,24 +60,8 @@ const deleteExpense=async (req, res)=>{
     res.sendStatus(200);
 };
 
-// const updateExpense=async (req, res)=>{;
-//     const uId=req.user.id;
-//     const amount=req.body.amount;
-//     const description=req.body.description;
-//     const category=req.body.category;
-    
-//     await Expense.update({
-//         amount: amount,
-//         description: description,
-//         category: category
-//     },
-//     {where:{id: uId}});
-//     res.sendStatus(200);
-// };
-
 module.exports={
     addExpense,
     getExpenses,
-    deleteExpense,
-    // updateExpense
+    deleteExpense
 };

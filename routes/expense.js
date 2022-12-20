@@ -9,8 +9,6 @@ router.post('/add-expense', userAuthentication.authentication ,expenseController
 
 router.get('/get-expenses', userAuthentication.authentication ,expenseController.getExpenses);
 
-// router.put('/update-expense/:id',expenseController.updateExpense);
-
 router.delete('/delete-expense/:id', userAuthentication.authentication ,expenseController.deleteExpense);
 
 module.exports=router;

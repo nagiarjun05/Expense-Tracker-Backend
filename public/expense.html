@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonwebtoken/8.5.1/verify.js"></script> -->
+    <title>Expense</title>
+    <link rel="stylesheet" href="./style.css"/>
+    <form >
+        <label for="perpage">Rows per page</label>
+        <input type="text" id="perpage" placeholder="Number">        
+    </form>
+    <br>
+    <br>
+</head>
+<body>
+    <form >
+        <label for="amount">Enter Expense Amount : </label>
+        <input type="number" id="amount">
+        <label for="description">Enter Expense Description : </label>
+        <input type="text" id="description">
+        <label for="expenseCategory">Choose Expense Category : </label>
+        <input type="text" list="expenseCategory" id="expenseCat" >
+        <datalist id="expenseCategory">
+            <option value="Fuel">Fuel</option>
+            <option value="Movie">Movie</o`ption>
+            <option value="Shopping">Shopping</option>
+            <option value="Food">Food</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Miscellaneous">Miscellaneous</option>
+        </datalist>
+        <br>
+        <br>
+        <button id="addExpense">Add Expense</button>
+    </form>
+    <br>
+    <button id="purchase">Buy Premium Membership</button>
+    <br>
+    <div id="msg">
+
+    </div>
+    <div>
+        <button id="show-leaderboard" style="display: none;">Show Leader Board</button>
+        <br>
+        <button id="show-report" style="display: none;">Show Expense Report</button>
+    </div>
+    
+    <h2 id="expenses-h2">EXPENSES</h2>
+    <ul id="exp-list"></ul>
+    
+    <h2 id="leaderboard-h2" style="display: none;">LEADERBOARD</h2>
+    <ul id="leaderboard" style="display: none;"></ul>
+    
+    <h2 id="report-h2" style="display: none;">REPORT</h2>
+    <ul id="report" style="display: none;">
+        
+    </ul>
+    <button id="download">Download Expense Report</button>
+    <section class="pagination">
+    </section>
+    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+<script src="./expense.js"></script>
+</body>
+</html>
