@@ -6,13 +6,18 @@ resetLink.addEventListener('click',(e)=>{
     e.preventDefault();
     axios({
         method:"get",
-        url:'http://3.109.48.0/password/forgetpassword',
+        url:'http://13.234.127.142/password/forgetpassword',
         headers:{'email': email.value}
     })
     .then((res)=>[
         console.log(res)
     ])
     .catch((err)=>{
-        console.log(err)
+        showError(err)
     })
 });
+
+
+function showError(err){
+    document.body.innerHTML += `<div style="color:red;"> ${err}</div>`
+};

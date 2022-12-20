@@ -24,7 +24,7 @@ perpage.addEventListener('input',(e)=>{
 const getExpenses=function(page){
     axios({
         method:'get',
-        url:`http://3.109.48.0:4000/expenses/get-expenses/?page=${page}`,
+        url: `http://13.234.127.142:4000/expenses/get-expenses/?page=${page}`,
         headers:{'Authorization':token, 'rowperpage':rowperpage}
     })
     .then(res=>{
@@ -98,7 +98,7 @@ function addExpense(e){
     e.preventDefault();
     axios({
         method:'post',
-        url:`http://3.109.48.0:4000/expenses/add-expense`,
+        url:`http://13.234.127.142:4000/expenses/add-expense`,
         data:{
             amount:`${amount.value} `,
             description:`${description.value} `,
@@ -130,7 +130,7 @@ function removeExpense(e){
         console.log("delete")
         axios({
             method:'delete',
-            url:`http://3.109.48.0:4000/expenses/delete-expense/${e.target.parentElement.value}`,
+            url:`http://13.234.127.142:4000/expenses/delete-expense/${e.target.parentElement.value}`,
             headers:{'Authorization':token}
         })
         .then((res)=>{
@@ -151,7 +151,7 @@ function removeExpense(e){
 document.getElementById('purchase').onclick= async function (e){
     const response= await axios({
         method:'get',
-        url:'http://3.109.48.0:4000/purchase/premiummembership',
+        url:'http://13.234.127.142:4000/purchase/premiummembership',
         headers:{'Authorization':token}
     })
 
@@ -171,7 +171,7 @@ document.getElementById('purchase').onclick= async function (e){
         "handler":function(response){
             axios({
                 method:'post',
-                url:'http://3.109.48.0:4000/purchase/updatetransaction',
+                url:'http://13.234.127.142:4000/purchase/updatetransaction',
                 data:{
                     order_id:options.order_id,
                     payment_id:response.razorpay_payment_id
@@ -224,7 +224,7 @@ const getLeaderboard=function(){
     document.getElementById('leaderboard-h2').style.display='block';
     axios({
         method:'get',
-        url:'http://3.109.48.0:4000/premium/get-leaderboard',
+        url:'http://13.234.127.142:4000/premium/get-leaderboard',
         headers:{'Authorization':token}    
     })
     .then((res)=>{
@@ -237,7 +237,7 @@ const getLeaderboard=function(){
         })
     })
     .catch((err)=>{
-        console.log(err)
+        showError(err)
     })
 }
 
@@ -255,7 +255,7 @@ function downloadFile(e){
     e.preventDefault();
     axios({
         method:'get',
-        url:'http://3.109.48.0:4000/users/download',
+        url:'http://13.234.127.142:4000/users/download',
         headers:{'Authorization':token}
     })
     .then((res)=>{

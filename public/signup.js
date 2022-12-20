@@ -13,7 +13,7 @@ signup.addEventListener('click',(e)=>{
     const  password=passWord.value;
     axios({
             method:'post',
-            url:`http://3.109.48.0:4000/users/signup`,
+            url:`http://13.234.127.142:4000/users/signup`,
             data:{
                 name: name,
                 email: email,
@@ -26,5 +26,9 @@ signup.addEventListener('click',(e)=>{
             alert(res.data.message);
             window.location.href="./login.html"
         })
-        .catch((err)=>console.log(err));
+        .catch((err)=>showError(err));
 });
+
+function showError(err){
+    document.body.innerHTML += `<div style="color:red;"> ${err}</div>`
+};

@@ -17,7 +17,7 @@ login.addEventListener('click',(e)=>{
 
     axios({
         method:'post',
-        url:`http://3.109.48.0:4000/users/login`,
+        url:`http://13.234.127.142:4000/users/login`,
         data:{
             email: email,
             password: password
@@ -30,7 +30,7 @@ login.addEventListener('click',(e)=>{
         window.location.href="./expense.html"
     })
     .catch((err)=>{
-        console.log(err)
+        showError(err)
         // alert(err.DATA)
     })
 });
@@ -39,4 +39,9 @@ login.addEventListener('click',(e)=>{
 forgetPassword.addEventListener('click',(e)=>{
     e.preventDefault()
     window.location.href="/forgetPassword.html"
-})
+});
+
+
+function showError(err){
+    document.body.innerHTML += `<div style="color:red;"> ${err}</div>`
+};
