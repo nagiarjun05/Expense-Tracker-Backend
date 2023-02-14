@@ -5,7 +5,7 @@ const authentication=(req, res, next)=>{
         const token=req.headers.authorization;
         const user=jwt.verify(token, 'secretToken')
         // console.log(user.userId)
-        User.findByPk(user.userId)
+        User.findById({'_id':user.userId})
         .then((user)=>{
             // if(JSON.stringify(user.ispremiumuser)){
             //     console.log("yes");

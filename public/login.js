@@ -17,14 +17,14 @@ login.addEventListener('click',(e)=>{
 
     axios({
         method:'post',
-        url:`http://13.234.127.142:4000/users/login`,
+        url:`http://localhost:4000/users/login`,
         data:{
             email: email,
             password: password
         }
     })
     .then((res)=>{
-        // console.log(res.data.token)
+        // console.log(res)
         alert(res.data.message)
         localStorage.setItem('token', res.data.token)
         window.location.href="./expense.html"

@@ -5,7 +5,6 @@ const sequelize=require('../util/database');
 
 const getLeaderboard=async(req, res)=>{
     try{
-
         const users=await User.findAll({
             attributes:['id','name',[sequelize.fn('sum',sequelize.col('expenses.amount')),'total']],
             include:[

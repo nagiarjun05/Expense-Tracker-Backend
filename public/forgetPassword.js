@@ -6,7 +6,7 @@ resetLink.addEventListener('click',(e)=>{
     e.preventDefault();
     axios({
         method:"get",
-        url:'http://13.234.127.142/password/forgetpassword',
+        url:'http://localhost/password/forgetpassword',
         headers:{'email': email.value}
     })
     .then((res)=>[

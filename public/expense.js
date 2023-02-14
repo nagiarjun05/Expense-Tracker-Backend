@@ -1,3 +1,5 @@
+// 13.234.127.142
+
 var addExp=document.getElementById("addExpense");
 var amount=document.getElementById("amount");
 var description=document.getElementById("description");
@@ -24,11 +26,12 @@ perpage.addEventListener('input',(e)=>{
 const getExpenses=function(page){
     axios({
         method:'get',
-        url: `http://13.234.127.142:4000/expenses/get-expenses/?page=${page}`,
+        url: `http://localhost:4000/expenses/get-expenses/?page=${page}`,
         headers:{'Authorization':token, 'rowperpage':rowperpage}
     })
     .then(res=>{
         if (res.data.premiumuser==true){
+            console.log("true")
             document.body.className='dark';
             document.getElementById('purchase').style.display='none';
             document.getElementById('purchase').style.display='none';
@@ -40,20 +43,27 @@ const getExpenses=function(page){
             leaderboard();
             report();
         }
+        console.log("false")
         expenseList.innerHTML='';
         res.data.allExpenses.forEach(element => {
             var li = document.createElement('li');
+            const id=element._id.toString();
             li.className='expenseDet';
             li.innerHTML=`${element.amount}-${element.description}-${element.category}-`;
             
-            li.value=`${element.id}`;
             var deleteExpense=document.createElement('button');
             deleteExpense.className='dlt';
             deleteExpense.textContent='Delete Expense';
             deleteExpense.style.border='solid 2px red';
-    
+
+            var expenseId=document.createElement('div');
+            expenseId.className='expenseId';
+            expenseId.textContent=`${id}`;
+            expenseId.style.display='none';
+
+            // console.log(expenseId.innerText)
             li.appendChild(deleteExpense);
-            
+            li.appendChild(expenseId);
             expenseList.appendChild(li);
         });
         pagination(res.data.currentPage,res.data.hasNextPage,res.data.nextPage,res.data.hasPreviousPage,res.data.previousPage)
@@ -98,7 +108,7 @@ function addExpense(e){
     e.preventDefault();
     axios({
         method:'post',
-        url:`http://13.234.127.142:4000/expenses/add-expense`,
+        url:`http://localhost:4000/expenses/add-expense`,
         data:{
             amount:`${amount.value} `,
             description:`${description.value} `,
@@ -127,16 +137,16 @@ function addExpense(e){
 function removeExpense(e){
     e.preventDefault();
     if(e.target.classList.contains('dlt')){
-        console.log("delete")
+        console.log(e.target.parentElement.children[1].innerText)
         axios({
             method:'delete',
-            url:`http://13.234.127.142:4000/expenses/delete-expense/${e.target.parentElement.value}`,
+            url:`http://localhost:4000/expenses/delete-expense/${e.target.parentElement.children[1].innerText}`,
             headers:{'Authorization':token}
         })
         .then((res)=>{
             if(res.status==200){
-                expenseList.removeChild(e.target.parentElement)
             }
+            expenseList.removeChild(e.target.parentElement)
             const page=1;
             getExpenses(page)
         })
@@ -151,7 +161,7 @@ function removeExpense(e){
 document.getElementById('purchase').onclick= async function (e){
     const response= await axios({
         method:'get',
-        url:'http://13.234.127.142:4000/purchase/premiummembership',
+        url:'http://localhost:4000/purchase/premiummembership',
         headers:{'Authorization':token}
     })
 
@@ -171,7 +181,7 @@ document.getElementById('purchase').onclick= async function (e){
         "handler":function(response){
             axios({
                 method:'post',
-                url:'http://13.234.127.142:4000/purchase/updatetransaction',
+                url:'http://localhost:4000/purchase/updatetransaction',
                 data:{
                     order_id:options.order_id,
                     payment_id:response.razorpay_payment_id
@@ -224,7 +234,7 @@ const getLeaderboard=function(){
     document.getElementById('leaderboard-h2').style.display='block';
     axios({
         method:'get',
-        url:'http://13.234.127.142:4000/premium/get-leaderboard',
+        url:'http://localhost:4000/premium/get-leaderboard',
         headers:{'Authorization':token}    
     })
     .then((res)=>{
@@ -255,7 +265,7 @@ function downloadFile(e){
     e.preventDefault();
     axios({
         method:'get',
-        url:'http://13.234.127.142:4000/users/download',
+        url:'http://localhost:4000/users/download',
         headers:{'Authorization':token}
     })
     .then((res)=>{

@@ -24,8 +24,8 @@ const forgetpassword=async(req, res)=>{
             const msg = {
                 to: email, // Change to your recipient
                 from: 'nagiarjun05@gmail.com', // Change to your verified sender
-                subject: 'Sending with SendGrid is Fun',
-                text: 'and easy to do anywhere, even with Node.js',
+                subject: 'To reset password',
+                text: `This is your link to reset your account's password`,
                 html: `<a href='http://localhost:4000/password/resetpassword/${id}'>Reset password</a>`
               }
 

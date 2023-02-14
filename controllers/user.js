@@ -7,7 +7,6 @@ const jwt=require('jsonwebtoken');
 
 
 const AWS=require('aws-sdk');
-const { param } = require('../routes/user');
 
 function stringValidator(string){
     if(string===undefined||string.length===0){
@@ -18,7 +17,7 @@ function stringValidator(string){
 }
 
 function generateTokken(id,name,ispremiumuser){
-    return jwt.sign({userId: id, name: name, ispremiumuser}, 'secretToken')
+    return jwt.sign({userId: id, name: name, ispremiumuser: ispremiumuser}, 'secretToken')
 }
 
 const signup= async (req, res)=>{
@@ -34,11 +33,19 @@ const signup= async (req, res)=>{
 
         const saltRounds = 10;
         bcrypt.hash(password, saltRounds, async(err, hash)=>{
-            await User.create({
+            //Sequelized Way to add user
+            // await User.create({
+            //     name: name,
+            //     email: email,
+            //     password: hash
+            // });
+            
+            //Mongoose Way to add user
+            await new User({
                 name: name,
                 email: email,
                 password: hash
-            });
+            }).save();
             await res.status(201).json({success: true, message: "Succesfully create new User"});
         }) 
     } catch(err){
@@ -49,16 +56,20 @@ const signup= async (req, res)=>{
 const login=async (req, res)=>{
     try{
         const {email, password}=req.body;
+        // Mongoose way
+        const users= await User.find({'email':email })
 
-        const users= await User.findAll({ where : { email }})
+        // Sequelized way
+        // const users= await User.findAll({ where : { email }})
                 
         if (users.length>0){
-            bcrypt.compare(password, users[0].dataValues.password, (err, result)=>{
+            bcrypt.compare(password, users[0].password, (err, result)=>{
                 if(err){
                     throw new Error('Something went wrong')
                 }
                 else if(result){
-                    return res.status(200).json({success: true, message: 'User Loged in Succesfully!', token:(generateTokken(users[0].dataValues.id,users[0].dataValues.name,users[0].dataValues.ispremiumuser))})
+                    // console.log(users[0])
+                    return res.status(200).json({success: true, message: 'User Loged in Succesfully!', token:(generateTokken(users[0]._id,users[0].name,users[0].ispremiumuser))})
                 }
                 else{
                     return res.status(400).json({success: false, message: 'Password is Inconrrect!'})
