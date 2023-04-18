@@ -42,11 +42,10 @@ const expenseSchema=new Schema({
     type: String,
     required: true
   },
-  userId:{
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  }
+  user:{
+    userId:{ type: Schema.Types.ObjectId,  ref: 'User', required: true },
+    name:{ type: String, required: true }
+}
 });
 
 module.exports=mongoose.model('Expense', expenseSchema);

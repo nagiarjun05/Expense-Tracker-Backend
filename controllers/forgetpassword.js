@@ -1,6 +1,6 @@
 const User=require('../models/User')
 const sgMail = require('@sendgrid/mail')
-const uuid=require('uuid');
+// const uuid=require('uuid');
 const ForgetPassword = require('../models/forgetpassword');
 
 const bcrypt=require('bcrypt');
@@ -9,14 +9,27 @@ const bcrypt=require('bcrypt');
 const forgetpassword=async(req, res)=>{
     try{
         const email=req.headers.email;
-        console.log(email)
 
-        const user=await User.findOne({where:{email}})
-        if(user){
-            const id=uuid.v4();
-            user.createForgetpassword({id,active:true})
-            .catch((err)=>{
-                throw new Error(err)
+        // Sequelize way 
+        // const user=await User.findOne({where:{email}})
+
+        // mongoose way
+        const user= await User.find({'email':email})
+
+        if(user.length>0){
+            // Sequelize way
+            // const id=uuid.v4();
+            // user.createForgetpassword({id,active:true})
+
+            // mongoose way
+            const id=user[0]._id
+            // console.log(id)
+            const newPasswordLink=await new ForgetPassword({
+                active:true,
+                userId:id
+            })
+            .save().catch((err)=>{
+                console.log(err)
             })
 
             sgMail.setApiKey(process.env.SENDGRID_API_KEY)
@@ -26,10 +39,10 @@ const forgetpassword=async(req, res)=>{
                 from: 'nagiarjun05@gmail.com', // Change to your verified sender
                 subject: 'To reset password',
                 text: `This is your link to reset your account's password`,
-                html: `<a href='http://localhost:4000/password/resetpassword/${id}'>Reset password</a>`
+                html: `<a href='http://localhost:4000/password/resetpassword/${newPasswordLink._id}'>Reset password</a>`
               }
 
-            console.log(msg)
+            console.log(`href='http://localhost:4000/password/resetpassword/${newPasswordLink._id}`)
               
             sgMail
             .send(msg)
@@ -39,73 +52,86 @@ const forgetpassword=async(req, res)=>{
                 return res.status(response[0].statusCode).json({message:"Link to reset password sent to your mail", succes: true})
             })
             .catch((error) => {
+                console.log(error)
                 throw new Error(error)
             })
         }else{
-            throw new Error(`User Doesn't exist`)
+            return res.status(404).json({message:`User Doesn't exist`, success:false})
         }
     }
     catch(err){
         console.log(err);
-        return res.json({message: err, success:false})
+        return res.status(500).json({message: err, success:false})
     }  
 }
 
 
-const resetpassword=(req, res)=>{
-    const id=req.params.id;
-    
-    ForgetPassword.findOne({where:{id}})
-    .then((user)=>{
+const resetpassword=async(req, res)=>{
+    try{
+        const id=req.params.id;
+
+        const forgetId= await ForgetPassword.findById(id)
+        const user=await User.findById(forgetId.userId);
         if (user){
-            user.update({active: false})
             res.status(200).send(`<html>
-                                    <script>
-                                        function formsubmitted(e){
-                                            e.preventDefault();
-                                            console.log('called')
-                                        }
-                                    </script>
                                     <form action="/password/updatepassword/${id}" method="get">
                                         <label for="newpassword">Enter New Password :</label>
                                         <input type="password" name="newpassword"></input>
                                         <button>Reset Password</button>
                                     </form>
-                                </html>`
-                                )
+                                </html>`)
             res.end()
+            }
         }
-    })
-}
+    catch{
+        console.log(err);
+        return res.json({message: err, success:false})
+    }
+};
 
-const updatepassword=(req, res)=>{
+const updatepassword=async (req, res)=>{
     try{
-        const { newpassword } = req.query;
+        const {newpassword} = req.query;
         const {id}=req.params;
 
-        ForgetPassword.findOne({where:{id}})
-        .then((request)=>{
-            User.findOne({where:{id:request.userId}})
-            .then((user)=>{
-                if(user){
-                    const saltRounds=10;
+        //Sequelize way
+        // ForgetPassword.find({'userId':id})
+        // .then((request)=>{
+        //     User.findById({'_id':id})
+        //     .then((user)=>{})
 
-                    bcrypt.hash(newpassword, saltRounds, function(err, data){
-                        if(err){
-                            throw new Error(err)
-                        }
+        //Mongoose way
+        const forgetPassword=await ForgetPassword.findByIdAndUpdate(id,{active:false});
+        const user=await User.findById(forgetPassword.userId);
 
-                        user.update({password: data})
-                        .then(()=>{
-                            res.status(201).json({message: "Successfully update the password"})
-                        })
-                    })
-                }else{
-                    return res.status(404).json({message: "No user exist", succes: false})
+        if(user){
+            const saltRounds=10;
+            bcrypt.hash(newpassword, saltRounds, async function(err, data){
+                if(err){
+                    throw new Error(err)
                 }
-           })
-        })
-    }
+
+                //Sequelize way
+                // user.update({password: data})
+
+                //Mongoose way
+                await User.findByIdAndUpdate(user._id,{password:data})
+                await ForgetPassword.findOneAndRemove(id);
+        
+                res.status(201).send(`<html>
+                                        <div>
+                                            <h1>"Successfully update the password"</h1>
+                                        </div>
+                                        <div>
+                                            <h1><a href='http://localhost:4000/login.html'>"Login in your account"</a></h1>
+                                        </div>
+                                    </html>`)
+                res.end()             
+            })
+        }else{
+            return res.status(404).json({message: "No user exist", succes: false})
+             }
+        }
     catch(error){
         return res.status(403).json({error, succes: false})
     }

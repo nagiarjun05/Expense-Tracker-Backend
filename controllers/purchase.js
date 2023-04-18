@@ -5,7 +5,7 @@ const jwt=require('jsonwebtoken');
 
 function generateTokken(id,name, ispremiumuser){
     return jwt.sign({userId: id, name: name, ispremiumuser: ispremiumuser}, 'secretToken')
-}
+};
 
 const purchasePremimum=async (req, res)=>{
     try{
@@ -14,9 +14,7 @@ const purchasePremimum=async (req, res)=>{
             key_secret:process.env.RAZORPAY_KEY_SECRET
         })
 
-        const amount=100;
-
-        rzp.orders.create({amount, currency:"INR"}, (err, order) =>{
+        rzp.orders.create({amount:10000, currency:"INR"}, (err, order) =>{
             if(err){
                 console.log(err)
                 throw new Error(err);
@@ -24,6 +22,7 @@ const purchasePremimum=async (req, res)=>{
             
             //Seqelized way
             // req.user.createOrder({orderid:order.id,status:"PENDING"})
+            // console.log(order)
 
             //Mongoose way
             new Order({
@@ -36,16 +35,17 @@ const purchasePremimum=async (req, res)=>{
         })
     }
     catch{
-        res.status(403).json({message:'Something went wrong!',error:err})
+        return res.status(403).json({message:'Something went wrong!',error:err})
     }   
 }
 
 
-const updateTransactionStatus=(req, res)=>{
+const updateTransactionStatus=async (req, res)=>{
     try{
-        // console.log(req.user)
-        const{payment_id,order_id}=req.body;
+        // console.log(req.body)
+        const{order_id,payment_id}=req.body;
         
+        //Sequelize way
         // Order.find({where: {orderid: order_id}})
         // .then((order)=>{
         //     order.update({paymentid:payment_id, status:'SUCCESSFUL'})
@@ -61,31 +61,17 @@ const updateTransactionStatus=(req, res)=>{
         //     throw new Error(err)
         // })
 
-        // console.log(order_id)
-        // const query = {'orderid': order_id};
-        // Order.findOneAndUpdate(query,{paymentid:payment_id, status:'SUCCESSFUL'},{upsert:true})
-        // User.findByIdAndUpdate(req.user._id,{ispremiumuser:true})
-        User.findById(req.user._id).exec().then((user)=>{
-            return user.update({ispremiumuser: true})
-        })
-
-        Order.findOne({orderid: `${order_id}`}).exec()
-        .then((order)=>{
-            return order.update({paymentid:payment_id, status:'SUCCESSFUL'}).then(()=>{
-                return res.status(202).json({success: true, message:'Transaction Successful!!', token: generateTokken(req.user.id, req.user.name, req.user.ispremiumuser)})        
-            })
-        })
-
-        // .then((order)=>{
-        //         order.update({paymentid:payment_id, status:'SUCCESSFUL'})
-        // })
-
-        // User.findByIdAndUpdate(req.user._id,{ispremiumuser: true},{upsert:true}?)
-        // return res.status(202).json({success: true, message:'Transaction Successful!!', token: generateTokken(req.user.id, req.user.name, req.user.ispremiumuser)})
-
-        
+        //Mongoose way
+        const filter={'orderid': order_id};
+        const update={paymentid:payment_id, status:'SUCCESSFUL'}
+        await Order.findOneAndUpdate(filter,update,{
+            new: true,
+            upsert: true
+        });
+        await User.findByIdAndUpdate(req.user._id,{ispremiumuser: true},{upsert:true})
+        return res.status(202).json({success: true, message:'Transaction Successful!!', token: generateTokken(req.user.id, req.user.name, req.user.ispremiumuser)})
     }
-    catch{
+    catch(err){
         res.status(403).json({error: err, message:'Something went wrong'})
     }
 }

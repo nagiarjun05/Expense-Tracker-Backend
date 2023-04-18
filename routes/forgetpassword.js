@@ -10,5 +10,4 @@ router.get('/resetpassword/:id', forgetpasswordController.resetpassword)
 
 router.get('/updatepassword/:id', forgetpasswordController.updatepassword)
 
-
 module.exports=router;

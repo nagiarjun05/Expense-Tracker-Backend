@@ -7,6 +7,4 @@ const router=express.Router();
 
 router.get('/get-leaderboard', userAuthentication.authentication ,premiumController.getLeaderboard)
 
-// router.post('/updatetransaction', userAuthentication.authentication, purchaseController.updateTransactionStatus)
-
 module.exports=router;

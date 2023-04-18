@@ -3,15 +3,17 @@ const userEmail=document.getElementById("user-email");
 const passWord=document.getElementById("password");
 const signup=document.getElementById("signup");
 
-signup.addEventListener('click',(e)=>{
-    if (!userName.value||!userEmail.value||!passWord.value){
-        alert("All fields are mandatory!")
-    }
-    e.preventDefault();
-    const  name=userName.value;
-    const  email=userEmail.value;
-    const  password=passWord.value;
-    axios({
+signup.addEventListener('click',async (e)=>{
+    try{
+        e.preventDefault();
+        if (!userName.value||!userEmail.value||!passWord.value){
+            return alert("All fields are mandatory!")
+        }
+        const  name=userName.value;
+        const  email=userEmail.value;
+        const  password=passWord.value;
+        
+        const res=await axios({
             method:'post',
             url:`http://localhost:4000/users/signup`,
             data:{
@@ -21,12 +23,19 @@ signup.addEventListener('click',(e)=>{
                 }
             }
         )
-        .then(res=>{
-            // console.log(res.data);
-            alert(res.data.message);
-            window.location.href="./login.html"
-        })
-        .catch((err)=>showError(err));
+        alert(res.data.message);
+        window.location.href="./login.html"
+    }
+    catch(err){
+        if (err.response.status === 400) {
+            alert(err.response.data.message);
+        } else if (err.response.status === 403) {
+            alert(err.response.data.message);
+        } else if (err.response.status === 500) {
+            alert(err.response.data.message);
+        } else {
+            showError(err)
+        }};
 });
 
 function showError(err){

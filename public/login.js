@@ -2,37 +2,37 @@ const userEmail=document.getElementById("user-email");
 const passWord=document.getElementById("password");
 const login=document.getElementById("login");
 const forgetPassword=document.getElementById("forgetpassword");
-// const axios=require('axios');
 
-// console.log(axios);
-login.addEventListener('click',(e)=>{
-    e.preventDefault();
-    const  email=userEmail.value;
-    const  password=passWord.value;
-    console.log(email)
-    
-    if (!email||!password){
-        alert("All fields are mandatory!")
-    }
+login.addEventListener('click',async (e)=>{
+    try{
+        e.preventDefault();
+        const  email=userEmail.value;
+        const  password=passWord.value;
 
-    axios({
-        method:'post',
-        url:`http://localhost:4000/users/login`,
-        data:{
-            email: email,
-            password: password
+        if (!email||!password){
+            return alert("All fields are mandatory!")
         }
-    })
-    .then((res)=>{
-        // console.log(res)
+        const res= await axios({
+            method:'post',
+            url:`http://localhost:4000/users/login`,
+            data:{ email: email, password: password }
+        })
         alert(res.data.message)
         localStorage.setItem('token', res.data.token)
         window.location.href="./expense.html"
-    })
-    .catch((err)=>{
-        showError(err)
-        // alert(err.DATA)
-    })
+    }
+    catch(err){
+        console.log(err)
+        if (err.response.status === 400) {
+            alert(err.response.data.message);
+        } else if (err.response.status === 404) {
+            alert(err.response.data.message);
+        } else if (err.response.status === 500) {
+            alert(err.response.data.message);
+        } else {
+            showError(err)
+        }
+    };
 });
 
 

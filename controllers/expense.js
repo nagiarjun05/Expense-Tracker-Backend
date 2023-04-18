@@ -1,11 +1,11 @@
 const Expense = require('../models/expense');
 
-const addExpense= async (req, res)=>{
+const addExpense= async(req, res)=>{
     try{
         const amount=req.body.amount;
         const description=req.body.description;
         const category=req.body.category;
-        // console.log(req.user.id)
+                
         //Sequelize way
         // const data = await Expense.create({
         //     amount: amount,
@@ -13,17 +13,17 @@ const addExpense= async (req, res)=>{
         //     category: category,
         //     userId: req.user.id
         // });
-        //Mongoose way
+
+        // Mongoose way
         const expense = await new Expense({
             amount: amount,
             description: description,
             category: category,
-            userId: req.user.id
+            user: {userId:req.user.id,name:req.user.name}
         }).save();
-        // console.log(expense)
-        res.status(201).json({newExpenseDetail: expense});
+        return res.status(201).json({newExpenseDetail: expense});
     } catch(err){
-        res.status(500).json({
+        return res.status(500).json({
             error: err
         })
     }
@@ -31,14 +31,12 @@ const addExpense= async (req, res)=>{
 
 const getExpenses=async (req, res)=>{
     try{
-        const page= +req.query.page || 1;
+        // const page= +req.query.page || 1;
+        const page= +req.params.page || 1;
         let ITEM_PER_PAGE=+req.headers.rowperpage || 2;
-        // console.log(req.headers.rowperpage)
-
-        // const totalCount = await Expense.count({where:{userId:req.user.id}});
-        const totalCount = await Expense.count({'userId':req.user.id});
         
         //Sequelize way
+        // const totalCount = await Expense.count({where:{userId:req.user.id}});
         // const expenses=await Expense.findAll({
         //     where:{userId:req.user.id},
         //     offset: (page-1)*ITEM_PER_PAGE,
@@ -46,7 +44,8 @@ const getExpenses=async (req, res)=>{
         // })
 
         //Mongoose way
-        const expenses=await Expense.find({'userId':req.user.id}).skip((page-1)*ITEM_PER_PAGE).limit(ITEM_PER_PAGE)
+        const totalCount = await Expense.count({'user.userId':req.user._id});
+        const expenses=await Expense.find({'user.userId':req.user.id}).skip((page-1)*ITEM_PER_PAGE).limit(ITEM_PER_PAGE)
 
         res.status(200).json({
             allExpenses: expenses, 
@@ -56,7 +55,8 @@ const getExpenses=async (req, res)=>{
             nextPage:page+1,
             hasPreviousPage:page>1,
             previousPage:page-1,
-            lastPage:Math.ceil(totalCount/ITEM_PER_PAGE)
+            lastPage:Math.ceil(totalCount/ITEM_PER_PAGE),
+            totalCount:totalCount
         });
     }
     catch(err){

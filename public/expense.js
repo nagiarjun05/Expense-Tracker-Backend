@@ -1,5 +1,15 @@
 // 13.234.127.142
 
+
+//const rzp1=new Razorpay(options);
+// rzp1.open();
+// e.preventDefault();
+
+// rzp1.on('payment.failed', function(response){
+//     alert(response.error.description);
+// })
+
+
 var addExp=document.getElementById("addExpense");
 var amount=document.getElementById("amount");
 var description=document.getElementById("description");
@@ -19,21 +29,22 @@ downloadBtn.addEventListener('click', downloadFile);
 let rowperpage;
 perpage.addEventListener('input',(e)=>{
     rowperpage=e.target.value;
-    const page=1;
+    let page=1;
     getExpenses(page);
-})
+});
 
 const getExpenses=function(page){
     axios({
         method:'get',
-        url: `http://localhost:4000/expenses/get-expenses/?page=${page}`,
+        //page sent in query
+        // url: `http://localhost:4000/expenses/get-expenses/?page=${page}`,
+        //page sent in params
+        url: `http://localhost:4000/expenses/get-expenses/${page}`,
         headers:{'Authorization':token, 'rowperpage':rowperpage}
     })
     .then(res=>{
         if (res.data.premiumuser==true){
-            console.log("true")
             document.body.className='dark';
-            document.getElementById('purchase').style.display='none';
             document.getElementById('purchase').style.display='none';
             const premium=document.createElement('span');
             premium.textContent='You are a Premium User';
@@ -43,7 +54,6 @@ const getExpenses=function(page){
             leaderboard();
             report();
         }
-        console.log("false")
         expenseList.innerHTML='';
         res.data.allExpenses.forEach(element => {
             var li = document.createElement('li');
@@ -61,7 +71,6 @@ const getExpenses=function(page){
             expenseId.textContent=`${id}`;
             expenseId.style.display='none';
 
-            // console.log(expenseId.innerText)
             li.appendChild(deleteExpense);
             li.appendChild(expenseId);
             expenseList.appendChild(li);
@@ -79,15 +88,14 @@ function pagination(currentPage,hasNextPage,nextPage,hasPreviousPage,previousPag
         prevBtn.addEventListener('click',()=>{
             getExpenses(previousPage)
             });
-    }
-
+    };
+    
     const curBtn=document.createElement('button')
     curBtn.innerHTML=currentPage;
     pages.appendChild(curBtn);
-    curBtn.addEventListener('click',()=>{
+    curBtn.addEventListener('click',(e)=>{        
         getExpenses(currentPage)
-        });
-    
+    });
 
     if (hasNextPage){
         const nexBtn=document.createElement('button')
@@ -96,13 +104,13 @@ function pagination(currentPage,hasNextPage,nextPage,hasPreviousPage,previousPag
         nexBtn.addEventListener('click',()=>{
             getExpenses(nextPage)
             });
-    }
-}
+    };
+};
 
 window.addEventListener('load', ()=>{
-    const page=1;
+    let page=1;
     getExpenses(page)
-})
+});
 
 function addExpense(e){
     e.preventDefault();
@@ -119,7 +127,7 @@ function addExpense(e){
         if(res.status==201){
             expenseList.innerHTML='';
             document.getElementById('msg').innerHTML='';
-            const page=1;
+            let page=1;
             getExpenses(page);
             if(document.getElementById('leaderboard').innerHTML){
                 document.getElementById('leaderboard').innerHTML='';            
@@ -137,7 +145,7 @@ function addExpense(e){
 function removeExpense(e){
     e.preventDefault();
     if(e.target.classList.contains('dlt')){
-        console.log(e.target.parentElement.children[1].innerText)
+        // console.log(e.target.parentElement.children[1].innerText)
         axios({
             method:'delete',
             url:`http://localhost:4000/expenses/delete-expense/${e.target.parentElement.children[1].innerText}`,
@@ -147,7 +155,7 @@ function removeExpense(e){
             if(res.status==200){
             }
             expenseList.removeChild(e.target.parentElement)
-            const page=1;
+            let page=1;
             getExpenses(page)
         })
         .catch(err=>{
@@ -168,6 +176,8 @@ document.getElementById('purchase').onclick= async function (e){
     var options={
         "key":response.data.key_id,
         "name":"Test Company",
+        "amount":10000,
+        "currency":'INR',
         "order_id":response.data.order.id,
         "prefill":{
             "name":"Test User",
@@ -177,7 +187,8 @@ document.getElementById('purchase').onclick= async function (e){
         "theme":{
             "color":"#3399cc"
         },
-        //success payment handler
+
+        //Handler for payment succession
         "handler":function(response){
             axios({
                 method:'post',
@@ -190,28 +201,23 @@ document.getElementById('purchase').onclick= async function (e){
             })
             .then((res)=>{
                 localStorage.setItem('token',res.data.token)
-                const page=1;
+                let page=1;
                 getExpenses(page);
                 alert("You are a Premimum User now!")
             })
-            .catch(()=>{
+            .catch((err)=>{
+                console.log(err)
                 alert("Something went wrong!")
             })
         }
     }
-        const rzp1=new Razorpay(options);
-        rzp1.open();
-        e.preventDefault();
+    const rzp1=new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
 
-        rzp1.on('payment.failed', function(response){
-            alert(response.error.code);
-            alert(response.error.description);
-            alert(response.error.source);
-            alert(response.error.step);
-            alert(response.error.reason);
-            alert(response.error.metadata.order_id);
-            alert(response.error.metadata.payment_id)
-        })
+    rzp1.on('payment.failed', function(response){
+        alert(response.error.description);
+    })
 };
 
 

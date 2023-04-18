@@ -1,10 +1,9 @@
 const User=require('../models/User');
-const FileDownloaded=require('../models/downloadedfiles')
-
+const Expense=require('../models/expense');
+const FileDownloaded=require('../models/downloadedfiles');
 
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
-
 
 const AWS=require('aws-sdk');
 
@@ -27,9 +26,13 @@ const signup= async (req, res)=>{
         const password=req.body.password;
 
         if (stringValidator(name)||stringValidator(email)||stringValidator(password)){
-            console.log("error")
             return res.status(400).json({err: "Bad Parameters . Something is missing"})
-        }
+        };
+
+        const users= await User.find({'email':email })
+        if(users.length>0){
+            return res.status(403).json({success: false, message: "User Already Exist"});
+        };
 
         const saltRounds = 10;
         bcrypt.hash(password, saltRounds, async(err, hash)=>{
@@ -46,16 +49,18 @@ const signup= async (req, res)=>{
                 email: email,
                 password: hash
             }).save();
-            await res.status(201).json({success: true, message: "Succesfully create new User"});
+
+            return res.status(201).json({success: true, message: "Succesfully create new User"});
         }) 
     } catch(err){
-        res.status(500).json(err);
+        return res.status(500).json(err);
     }
 };
 
 const login=async (req, res)=>{
     try{
         const {email, password}=req.body;
+        
         // Mongoose way
         const users= await User.find({'email':email })
 
@@ -68,7 +73,6 @@ const login=async (req, res)=>{
                     throw new Error('Something went wrong')
                 }
                 else if(result){
-                    // console.log(users[0])
                     return res.status(200).json({success: true, message: 'User Loged in Succesfully!', token:(generateTokken(users[0]._id,users[0].name,users[0].ispremiumuser))})
                 }
                 else{
@@ -76,7 +80,7 @@ const login=async (req, res)=>{
                 }
             })
         }else{
-            return res.status(404).json({success: false, message: 'User Doesnt Exist!'})
+            return res.status(404).json({success: false, message: `User Doesn't Exist!`})
         }
     }
     catch(err){
@@ -114,20 +118,22 @@ function uploadToS3(data, filename){
 
 const download=async (req, res)=>{
     try{
-        const expenses= await req.user.getExpenses();
-        const stringifiedExpenses=JSON.stringify(expenses);
+        // sequelized way
+        // const expenses= await req.user.getExpenses();
 
+        // mongoose way
+        const expenses=await Expense.find({'userId':req.user._id},'amount description category')
+
+        const stringifiedExpenses=JSON.stringify(expenses);
         const filename=`Expense${req.user.id}/${new Date()}.txt`;
         const fileURL= await uploadToS3(stringifiedExpenses, filename);
-        console.log(fileURL)
         await FileDownloaded.create({
             url: fileURL
         });
-
         res.status(201).json({fileURL, success: true})
     }
-    catch{
-        res.status(500).json({fileURL:'', success: false, err:err})
+    catch(err){
+        res.status(500).json({fileURL:'', success: false, message:err})
     }  
 }
 
